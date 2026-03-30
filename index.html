@@ -344,9 +344,11 @@
             { title: '🏆 Best Overall', pick: scored[0]?.name || 'TBD', reason: `Score ${scored[0]?.score}/45. ${scored[0]?.strengths?.split(',')[0]}` },
             { title: '⛷️ Best Skiing', pick: bigSki[0]?.name || 'TBD', reason: `${bigSki[0]?.pisteKm}km of piste — ${bigSki[0]?.skiArea}` },
             { title: '🚗 Easiest Drive', pick: closeDrive[0]?.name || 'TBD', reason: `${closeDrive[0]?.drive} / ${closeDrive[0]?.driveKm}km from Munich` },
-            { title: '💰 Best Value', pick: 'Franzls Hütte', reason: '€18-25/pp/night, 75km skiing, but only 28 beds' },
-            { title: '👥 Best for 30 ppl', pick: viable30.sort((a,b) => (b.score||0) - (a.score||0))[0]?.name || 'TBD', reason: `${viable30[0]?.beds} beds, viable for the full group` },
+            { title: '💰 Best Value', pick: 'Gruppenhaus Alpenglück', reason: '€26-55/pp, new sauna, cheapest ski pass (€308/6-day), 1h20 drive' },
+            { title: '👥 Best for 30 ppl', pick: viable30.sort((a,b) => (b.score||0) - (a.score||0))[0]?.name || 'TBD', reason: `${viable30[0]?.beds} beds, score ${viable30[0]?.score}/45` },
             { title: '🏔️ Best Hiking', pick: 'KSJ-Freizeithaus Pfelders', reason: 'Highest village (1632m), Texelgruppe Natural Park' },
+            { title: '🎿 Best Ski Value', pick: 'Schrempfhof', reason: '210km Snow Space + 760km Ski Amadé, pass only €352/6-day, all ensuite' },
+            { title: '📍 vs Last Year', pick: 'Marienhof auf der Höhe', reason: '30/45 — cheapest (€6-12/pp) but shared bathrooms, tiny local skiing' },
         ];
 
         document.getElementById('summary-picks').innerHTML = picks.map(p => `
@@ -361,11 +363,12 @@
             { icon: '⛔', text: '<strong>Bergheim Maria Trost</strong> — no car access in winter. Ruled out.' },
             { icon: '⛔', text: '<strong>Höllwart</strong> — ski lifts permanently closed + no party groups. Ruled out.' },
             { icon: '⚠️', text: '<strong>Maroldenhof (24), Franzls Hütte (28)</strong> — too few beds for 30 people.' },
-            { icon: '💡', text: '<strong>Saalbach ski pass</strong> is €425/6-day — significantly more expensive than other areas.' },
-            { icon: '💡', text: '<strong>Ski Amadé</strong> (Schrempfhof) offers 760km for ~€300/6-day — best km-per-euro.' },
-            { icon: '💡', text: '<strong>SkiWelt</strong> (Brixen) has 280km and is only 1h30 drive from Munich.' },
-            { icon: '📅', text: 'All shops closed Jan 1. Dec 31 closes early (14:00-17:00). Stock up by Dec 30.' },
-            { icon: '🆕', text: '6 new houses added — not yet scored. Brixen, Zillertal, Tuxertal, Krimml, Schrempfhof, Alpenglück.' },
+            { icon: '⚠️', text: '<strong>Homebase Zillertal</strong> — NYE 2025/26 already sold out. Book very early for 2026/27.' },
+            { icon: '⚠️', text: '<strong>Brixen</strong> — forces Sun-to-Sun full week in winter. No short stays.' },
+            { icon: '⚠️', text: '<strong>Tuxertal</strong> — listing page DOWN. Must bring own bedding/towels.' },
+            { icon: '💡', text: '<strong>Saalbach ski pass</strong> €425/6-day vs <strong>St. Johann</strong> €308 vs <strong>Ski Amadé</strong> €352.' },
+            { icon: '📅', text: 'All shops closed Jan 1. Dec 31 closes early. Stock up by Dec 30.' },
+            { icon: '✅', text: '<strong>Top shortlist for 30 ppl:</strong> Lindlinghof (38), Brixen (36), Alpenglück (35), Klammrast (35), Schrempfhof (33).' },
         ];
 
         document.getElementById('summary-findings').innerHTML = '<div style="background:var(--findings-bg);border-radius:12px;border:1px solid var(--border);padding:1rem 1.25rem">' +
