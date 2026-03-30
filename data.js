@@ -335,5 +335,27 @@ const houses = [
         link: "https://www.gruppenhaus-tirol.at/",
         image: "https://www.gruppenhaus-tirol.at/userdata/7503/pid/80446/pageElem/23649/29943/20231125_122354_Kopie.jpg",
         tier: "new"
+    },
+    // === LAST YEAR'S HOUSE (reference) ===
+    {
+        name: "Marienhof auf der H\u00f6he",
+        location: "Niederthai, \u00d6tztal, Tirol",
+        country: "Austria",
+        lat: 47.1259442, lng: 10.9697943,
+        rank: null, score: null, beds: 58, rooms: 13,
+        elevation: "1633m",
+        drive: "2h 05min", driveKm: 170, trainTime: "~3h10", trainChanges: "1",
+        trainNotes: "Train to \u00d6tztal Bahnhof (2h25, from \u20ac13), bus 4194 (44min) to Niederthai",
+        skiArea: "Niederthai (local) / S\u00f6lden", pisteKm: 144, lifts: 31, dayPass: "\u20ac36 local / \u20ac65 S\u00f6lden",
+        skiNotes: "4km beginner area at doorstep. Free ski bus to S\u00f6lden (144km, 25km) and Hochoetz (41km, 20km)",
+        price: "\u20ac6\u201312/pp + \u20ac5 tax", priceModel: "Per person",
+        sauna: false, saunaDetails: "",
+        kitchen: true, ensuite: false, wifi: true, parking: true, gameRoom: true,
+        strengths: "LAST YEAR'S HOUSE. Huge capacity (58-64), cheapest (\u20ac6-12/pp), 1633m altitude, pro gastro kitchen, billiards/darts/foosball, ski slope at door, free ski bus to S\u00f6lden",
+        warnings: "Shared bathrooms only. Utilities extra. Min 27-30 ppl. Local skiing tiny (4km). Supermarket 7km away",
+        dealbreaker: null,
+        link: "https://www.gruppenhaus.de/marienhof-auf-der-hoehe-umhausen-hs9218.html",
+        image: "https://www.gruppenhaus.de/mx_9218_a_76297_Stutensee_Marienhof+auf+der+H%C3%B6he_Niederthai+70.webp",
+        tier: "reference"
     }
 ];

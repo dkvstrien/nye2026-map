@@ -65,10 +65,10 @@
     <script>
     // ============ COLOR HELPERS ============
     function tierColor(tier) {
-        return { top: '#16a34a', solid: '#f59e0b', new: '#2563eb', issue: '#dc2626' }[tier] || '#94a3b8';
+        return { top: '#16a34a', solid: '#f59e0b', new: '#2563eb', issue: '#dc2626', reference: '#8b5cf6' }[tier] || '#94a3b8';
     }
     function tierLabel(tier) {
-        return { top: 'Top Pick', solid: 'Solid', new: 'New', issue: 'Issues' }[tier] || '';
+        return { top: 'Top Pick', solid: 'Solid', new: 'New', issue: 'Issues', reference: 'Last Year' }[tier] || '';
     }
     function scoreColor(score) {
         if (!score) return '#94a3b8';
@@ -260,6 +260,7 @@
                 <div class="legend-item"><span class="dot" style="background:#f59e0b"></span> Solid options</div>
                 <div class="legend-item"><span class="dot" style="background:#2563eb"></span> New (unscored)</div>
                 <div class="legend-item"><span class="dot" style="background:#dc2626"></span> Issues</div>
+                <div class="legend-item"><span class="dot" style="background:#8b5cf6"></span> Last year</div>
                 <div class="legend-item"><span class="dot" style="background:#1e40af"></span> Munich</div>
             `;
             return div;
