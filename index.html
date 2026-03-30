@@ -3,324 +3,374 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NYE 2026 Group Houses</title>
+    <title>NYE 2026 Group Houses — Comparison</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-        #map { height: 100vh; width: 100%; }
-
-        .house-popup { max-width: 320px; line-height: 1.5; }
-        .house-popup h3 { margin-bottom: 4px; font-size: 15px; }
-        .house-popup .rank-badge {
-            display: inline-block;
-            background: #2563eb;
-            color: white;
-            border-radius: 12px;
-            padding: 1px 8px;
-            font-size: 12px;
-            font-weight: 600;
-            margin-right: 6px;
-        }
-        .house-popup .score { color: #666; font-size: 13px; }
-        .house-popup .location { color: #888; font-size: 13px; margin-bottom: 8px; }
-        .house-popup .details { font-size: 13px; margin-bottom: 6px; }
-        .house-popup .details strong { color: #333; }
-        .house-popup .strengths { color: #16a34a; font-size: 13px; margin-bottom: 4px; }
-        .house-popup .warnings { color: #dc2626; font-size: 13px; font-weight: 500; }
-        .house-popup .link { font-size: 12px; margin-top: 6px; }
-        .house-popup .link a { color: #2563eb; }
-        .house-popup .dealbreaker {
-            background: #fef2f2;
-            border: 1px solid #fca5a5;
-            border-radius: 4px;
-            padding: 4px 8px;
-            margin-top: 6px;
-            font-size: 12px;
-            color: #991b1b;
-        }
-
-        .legend {
-            background: white;
-            padding: 12px 16px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            font-size: 13px;
-            line-height: 1.8;
-        }
-        .legend h4 { margin-bottom: 4px; font-size: 14px; }
-        .legend .legend-item { display: flex; align-items: center; gap: 8px; }
-        .legend .dot {
-            width: 14px; height: 14px;
-            border-radius: 50%;
-            display: inline-block;
-            border: 2px solid white;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-        }
-
-        .info-panel {
-            position: absolute;
-            top: 10px;
-            left: 55px;
-            z-index: 1000;
-            background: white;
-            padding: 10px 14px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            font-size: 13px;
-            max-width: 280px;
-        }
-        .info-panel h3 { font-size: 15px; margin-bottom: 4px; }
-        .info-panel p { color: #666; margin: 0; }
-    </style>
+    <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-    <div id="map"></div>
-    <div class="info-panel">
-        <h3>NYE 2026 Group Houses</h3>
-        <p>10 options from Munich by car/train. Click pins for details.</p>
-    </div>
+    <header class="site-header">
+        <h1>NYE 2026 Group Houses</h1>
+        <p>30 hikers & skiers from Munich — finding the perfect base</p>
+    </header>
+
+    <nav class="nav-tabs">
+        <button class="nav-tab active" data-tab="cards">Cards</button>
+        <button class="nav-tab" data-tab="map">Map</button>
+        <button class="nav-tab" data-tab="table">Compare</button>
+        <button class="nav-tab" data-tab="summary">Summary</button>
+    </nav>
+
+    <!-- CARDS VIEW -->
+    <section id="cards" class="section active">
+        <div class="controls">
+            <span class="control-label">Sort:</span>
+            <button class="filter-btn active" data-sort="rank">Rank</button>
+            <button class="filter-btn" data-sort="beds">Beds</button>
+            <button class="filter-btn" data-sort="driveKm">Drive</button>
+            <button class="filter-btn" data-sort="pisteKm">Ski area</button>
+            <button class="filter-btn" data-sort="price-low">Price</button>
+            <span class="control-label" style="margin-left:1rem">Filter:</span>
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="30plus">30+ beds</button>
+            <button class="filter-btn" data-filter="viable">Viable only</button>
+        </div>
+        <div class="cards-grid" id="cards-grid"></div>
+    </section>
+
+    <!-- MAP VIEW -->
+    <section id="map-section" class="section">
+        <div id="map-container"></div>
+    </section>
+
+    <!-- TABLE VIEW -->
+    <section id="table" class="section">
+        <div class="comparison-table-wrapper">
+            <table class="comparison-table" id="comparison-table">
+                <thead></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- SUMMARY VIEW -->
+    <section id="summary" class="section">
+        <h2>Quick Picks</h2>
+        <div class="summary-grid" id="summary-picks"></div>
+        <h2 style="margin-top:1.5rem">Key Findings</h2>
+        <div id="summary-findings"></div>
+    </section>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="data.js"></script>
     <script>
-    const houses = [
-        {
-            name: "Lindlinghof",
-            location: "Hinterglemm, Salzburg",
-            country: "Austria",
-            lat: 47.37739, lng: 12.5758,
-            rank: 1, score: 38, beds: 36,
-            elevation: "1020m",
-            drive: "2h 20min", train: "~4h (1-2 changes)",
-            ski: "Saalbach Skicircus — 270km, 70 lifts",
-            price: "On request",
-            strengths: "140m\u00b2 wellness (Finnish/herbal/infrared sauna), 270km skiing, best NYE atmosphere, all ensuite",
-            warnings: "Prices on request, ski pass \u20ac425/6-day",
-            link: "https://www.gruppenhaus.de/lindlinghof-stephanie-%26-christoph-hasenauer-hinterglemm-Oesterreich-hs12056.html",
-            color: "#16a34a"
-        },
-        {
-            name: "Ferienhaus Maroldenhof",
-            location: "Saalbach-Hinterglemm, Salzburg",
-            country: "Austria",
-            lat: 47.37501, lng: 12.543747,
-            rank: 2, score: 37, beds: 24,
-            elevation: "1003m",
-            drive: "2h 20min", train: "~3h30 (1-2 changes)",
-            ski: "Saalbach Skicircus — 270km, 70 lifts",
-            price: "\u20ac1,230-1,640/night flat",
-            strengths: "Two chalets (historic 1707 + modern 2019), 9 ensuite rooms, great NYE, Joker Card",
-            warnings: "Ski pass expensive (\u20ac425/6-day)",
-            link: "https://www.gruppenhaus.de/ferienhaus-maroldenhof-andrea-und-michael-hasenauer-saalbach-hinterglemm-hs10683.html",
-            color: "#16a34a"
-        },
-        {
-            name: "Klammrast",
-            location: "Wildsch\u00f6nau-Oberau, Tirol",
-            country: "Austria",
-            lat: 47.443864, lng: 12.049792,
-            rank: 3, score: 35, beds: 44,
-            elevation: "936m",
-            drive: "1h 20min", train: "~3h (1-2 changes)",
-            ski: "Ski Juwel — 109km, 45 lifts",
-            price: "On request",
-            strengths: "Closest drive from Munich (1h20), 44 beds, all ensuite, pets welcome, free ski bus",
-            warnings: "Prices on request",
-            link: "https://www.gruppenhaus.de/gruppen-selbstversorgerhaus-klammrast-wildschoenau-oberau-hs11216.html",
-            color: "#16a34a"
-        },
-        {
-            name: "N15 Selbstversorgerh\u00fctte",
-            location: "Hirschegg, Kleinwalsertal",
-            country: "Austria",
-            lat: 47.337596, lng: 10.173724,
-            rank: 4, score: 34, beds: 48,
-            elevation: "1124m",
-            drive: "2h", train: "~2h40 (1 change via Oberstdorf)",
-            ski: "Oberstdorf-Kleinwalsertal — 130km, 48 lifts",
-            price: "~\u20ac2,960/night flat rate",
-            strengths: "Biggest capacity (48 beds), 130km skiing, excellent winter hiking, easy train access, panoramic terrace",
-            warnings: "Expensive: ~\u20ac2,960/night, possible \u20ac2k weekend surcharge",
-            link: "https://www.gruppenhaus.de/n15-selbstversorgerhuette-im-kleinwalsertal-bis-zu-48-personen-hirschegg%2C-kleinwalsertal%2C-v-hs12873.html",
-            color: "#f59e0b"
-        },
-        {
-            name: "Haus Canisius",
-            location: "Matrei am Brenner, Tirol",
-            country: "Austria",
-            lat: 47.13363, lng: 11.45975,
-            rank: 5, score: 31, beds: 31,
-            elevation: "990m",
-            drive: "1h 30min", train: "~2h (1 change, Brenner line)",
-            ski: "Bergeralm — 29km, 7 lifts (Stubaier Gletscher 30min)",
-            price: "\u20ac850-1,250/night flat",
-            strengths: "Best train connection (Brenner mainline), B&B/half-board/full-board options, 2 seminar rooms",
-            warnings: "Small local ski area (29km)",
-            link: "https://www.gruppenhaus.de/haus-canisius-im-st.-michael-alpin-retreat-matrei-am-brenner-hs12729.html",
-            color: "#f59e0b"
-        },
-        {
-            name: "Johannishof im Allg\u00e4u",
-            location: "Nesselwang, Bavaria",
-            country: "Germany",
-            lat: 47.635292, lng: 10.632148,
-            rank: 6, score: 30, beds: 33,
-            elevation: "867m",
-            drive: "1h 25min", train: "~2h30 (1 change)",
-            ski: "Alpspitze Nesselwang — 8km, 5 lifts",
-            price: "\u20ac18-46/person/night",
-            strengths: "Working farm, 1h25 drive, good train link, K\u00f6nigscard included, own sledding hill",
-            warnings: "Small ski area (8km only)",
-            link: "https://www.gruppenhaus.de/johannishof-im-allgaeu-herzlich-willkommen-nesselwang-hs10449.html",
-            color: "#f59e0b"
-        },
-        {
-            name: "Franzls H\u00fctte",
-            location: "Nauders, Tirol",
-            country: "Austria",
-            lat: 46.887753, lng: 10.501707,
-            rank: 7, score: 29, beds: 28,
-            elevation: "1394m",
-            drive: "2h 30min", train: "~4h15 (2-3 changes)",
-            ski: "Nauders Bergkastel — 75km, 11 lifts",
-            price: "\u20ac18-25/person/night",
-            strengths: "Budget winner (\u20ac18-25/pp), 75km skiing, 3-country ski pass, high altitude = snow-sure",
-            warnings: "B180 Reschenpass under construction until end 2026, poor train link",
-            link: "https://www.gruppenhaus.de/franzls-huette-tiroler-oberland-nauders-hs11235.html",
-            color: "#f59e0b"
-        },
-        {
-            name: "H\u00f6llwart Selbstversorgerhaus",
-            location: "Goldeggweng, Salzburg",
-            country: "Austria",
-            lat: 47.316177, lng: 13.034937,
-            rank: 8, score: 24, beds: 33,
-            elevation: "854m",
-            drive: "2h", train: "~3h45 (2 changes)",
-            ski: "Local lifts CLOSED \u2014 nearest: St. Johann/Ski Amad\u00e9 12km",
-            price: "\u20ac410-500/night flat (up to 20 ppl)",
-            strengths: "Outdoor sauna, games room, cheap flat rate, football pitch",
-            warnings: "SKI LIFTS PERMANENTLY CLOSED since 2024/25. NO PARTY GROUPS rule.",
-            dealbreaker: "Main ski lifts closed + no parties",
-            link: "https://www.gruppenhaus.de/hoellwart-selbstversorgerhaus-50410-000024-2020-goldeggweng-hs10689.html",
-            color: "#dc2626"
-        },
-        {
-            name: "KSJ-Freizeithaus Pfelders",
-            location: "Pfelders, Moos in Passeier",
-            country: "Italy",
-            lat: 46.7956, lng: 11.0898,
-            rank: 9, score: 21, beds: 38,
-            elevation: "1632m",
-            drive: "3h", train: "6h+ (3+ changes)",
-            ski: "Pfelders — 18km, 4 lifts",
-            price: "\u20ac13-25/person/night",
-            strengths: "Highest village (1632m), cheapest option, stunning Texelgruppe nature, car-free tranquility",
-            warnings: "Very remote, car-free village, 18km piste only, nearest supermarket 20-45min, only 2 buses/day",
-            link: "https://www.gruppenhaus.de/ksj-freizeithaus-widum-pfelders-moos-in-passeier-hs6096.html",
-            color: "#dc2626"
-        },
-        {
-            name: "Bergheim Maria Trost",
-            location: "Nesselwang, Bavaria",
-            country: "Germany",
-            lat: 47.60813, lng: 10.51114,
-            rank: 10, score: 18, beds: 24,
-            elevation: "1123m",
-            drive: "1h 25min", train: "~2h30 (1 change)",
-            ski: "Alpspitze Nesselwang — 8km, 5 lifts",
-            price: "\u20ac125-264/night flat",
-            strengths: "Cheapest flat rate",
-            warnings: "NO CAR ACCESS November\u2013May. Only reachable by 45min uphill walk in winter.",
-            dealbreaker: "No vehicle access in winter",
-            link: "https://www.gruppenhaus.de/bergheim-maria-trost-nesselwang-hs3754.html",
-            color: "#dc2626"
-        }
-    ];
+    // ============ COLOR HELPERS ============
+    function tierColor(tier) {
+        return { top: '#16a34a', solid: '#f59e0b', new: '#2563eb', issue: '#dc2626' }[tier] || '#94a3b8';
+    }
+    function tierLabel(tier) {
+        return { top: 'Top Pick', solid: 'Solid', new: 'New', issue: 'Issues' }[tier] || '';
+    }
+    function scoreColor(score) {
+        if (!score) return '#94a3b8';
+        if (score >= 34) return '#16a34a';
+        if (score >= 28) return '#f59e0b';
+        return '#dc2626';
+    }
 
-    // Munich marker
-    const munich = { lat: 48.1351, lng: 11.5820 };
-
-    // Init map centered to show all locations + Munich
-    const map = L.map('map').setView([47.5, 11.5], 8);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors',
-        maxZoom: 18
-    }).addTo(map);
-
-    // Munich marker
-    const munichIcon = L.divIcon({
-        html: '<div style="background:#1e40af;color:white;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);">M</div>',
-        className: '',
-        iconSize: [32, 32],
-        iconAnchor: [16, 16]
+    // ============ NAV ============
+    let mapInitialized = false;
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            tab.classList.add('active');
+            const target = tab.dataset.tab;
+            const section = document.getElementById(target === 'map' ? 'map-section' : target);
+            section.classList.add('active');
+            if (target === 'map' && !mapInitialized) { initMap(); mapInitialized = true; }
+        });
     });
-    L.marker([munich.lat, munich.lng], { icon: munichIcon })
-        .addTo(map)
-        .bindPopup('<strong>Munich</strong><br>Starting point');
 
-    // Draw lines from Munich to each house
-    houses.forEach(h => {
-        L.polyline([[munich.lat, munich.lng], [h.lat, h.lng]], {
-            color: h.color,
-            weight: 1.5,
-            opacity: 0.3,
-            dashArray: '6 4'
+    // ============ CARDS ============
+    let currentSort = 'rank';
+    let currentFilter = 'all';
+
+    function sortHouses(arr, key) {
+        return [...arr].sort((a, b) => {
+            if (key === 'rank') {
+                const ar = a.rank || 99, br = b.rank || 99;
+                return ar - br;
+            }
+            if (key === 'beds') return (b.beds || 0) - (a.beds || 0);
+            if (key === 'driveKm') return (a.driveKm || 999) - (b.driveKm || 999);
+            if (key === 'pisteKm') return (b.pisteKm || 0) - (a.pisteKm || 0);
+            if (key === 'price-low') {
+                // Sort "on request" last
+                const pa = a.price.includes('request') ? 9999 : parseInt(a.price.replace(/[^\d]/g, ''));
+                const pb = b.price.includes('request') ? 9999 : parseInt(b.price.replace(/[^\d]/g, ''));
+                return pa - pb;
+            }
+            return 0;
+        });
+    }
+
+    function filterHouses(arr, filter) {
+        if (filter === '30plus') return arr.filter(h => h.beds >= 30);
+        if (filter === 'viable') return arr.filter(h => !h.dealbreaker);
+        return arr;
+    }
+
+    function renderCards() {
+        const grid = document.getElementById('cards-grid');
+        let sorted = sortHouses(houses, currentSort);
+        sorted = filterHouses(sorted, currentFilter);
+
+        grid.innerHTML = sorted.map(h => {
+            const color = tierColor(h.tier);
+            const imgStyle = h.image
+                ? `background-image: url('${h.image}')`
+                : `background: linear-gradient(135deg, ${color}22, ${color}44)`;
+
+            const amenities = [
+                h.sauna ? `<span title="Sauna">🧖</span>` : '',
+                h.ensuite ? `<span title="Ensuite rooms">🚿</span>` : '',
+                h.gameRoom ? `<span title="Game room">🎯</span>` : '',
+                h.wifi ? `<span title="WiFi">📶</span>` : '',
+                h.parking ? `<span title="Parking">🅿️</span>` : '',
+            ].filter(Boolean).join(' ');
+
+            const bedsClass = h.beds >= 30 ? '' : ' style="color:#dc2626"';
+            const bedsNote = h.beds < 25 ? ' (too small!)' : h.beds < 30 ? ' (tight)' : '';
+
+            const scoreBar = h.score
+                ? `<div class="score-bar">
+                     <span>${h.score}/45</span>
+                     <div class="score-fill"><div class="score-fill-inner" style="width:${(h.score/45*100)}%;background:${scoreColor(h.score)}"></div></div>
+                   </div>`
+                : '<span style="color:#64748b;font-size:12px">Not yet scored</span>';
+
+            const dealbreakerHtml = h.dealbreaker
+                ? `<div class="card-dealbreaker">⛔ ${h.dealbreaker}</div>`
+                : '';
+
+            return `
+                <div class="house-card ${h.dealbreaker ? 'dealbreaker' : ''}">
+                    <div class="card-image" style="${imgStyle}">
+                        ${h.rank ? `<div class="rank-badge" style="background:${color}">#${h.rank}</div>` : ''}
+                        <div class="tier-label" style="background:${color}">${tierLabel(h.tier)}</div>
+                    </div>
+                    <div class="card-body">
+                        <h3>${h.name}</h3>
+                        <div class="card-location">${h.location}, ${h.country} · ${h.elevation}</div>
+                        <div class="card-stats">
+                            <div class="stat"><span class="stat-icon">🛏️</span><span${bedsClass}>${h.beds} beds${bedsNote}</span></div>
+                            <div class="stat"><span class="stat-icon">🚗</span> ${h.drive} (${h.driveKm}km)</div>
+                            <div class="stat"><span class="stat-icon">⛷️</span> ${h.pisteKm}km piste</div>
+                            <div class="stat"><span class="stat-icon">💰</span> ${h.price}</div>
+                            <div class="stat"><span class="stat-icon">🚂</span> ${h.trainTime} (${h.trainChanges}x)</div>
+                            <div class="stat">${amenities || '<span style="opacity:0.4">No extras listed</span>'}</div>
+                        </div>
+                        <div class="card-pros">✅ ${h.strengths}</div>
+                        <div class="card-cons">⚠️ ${h.warnings}</div>
+                        ${dealbreakerHtml}
+                    </div>
+                    <div class="card-footer">
+                        <a href="${h.link}" target="_blank">View listing →</a>
+                        ${scoreBar}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // Sort buttons
+    document.querySelectorAll('[data-sort]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('[data-sort]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentSort = btn.dataset.sort;
+            renderCards();
+        });
+    });
+
+    // Filter buttons
+    document.querySelectorAll('[data-filter]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = btn.dataset.filter;
+            renderCards();
+        });
+    });
+
+    renderCards();
+
+    // ============ MAP ============
+    function initMap() {
+        const munich = { lat: 48.1351, lng: 11.5820 };
+        const map = L.map('map-container').setView([47.5, 11.5], 8);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 18
         }).addTo(map);
-    });
 
-    // House markers
-    houses.forEach(h => {
-        const icon = L.divIcon({
-            html: `<div style="background:${h.color};color:white;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;border:2.5px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);">${h.rank}</div>`,
-            className: '',
-            iconSize: [28, 28],
-            iconAnchor: [14, 14]
+        // Munich
+        const munichIcon = L.divIcon({
+            html: '<div style="background:#1e40af;color:white;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);">M</div>',
+            className: '', iconSize: [32, 32], iconAnchor: [16, 16]
+        });
+        L.marker([munich.lat, munich.lng], { icon: munichIcon }).addTo(map).bindPopup('<strong>Munich</strong><br>Starting point');
+
+        houses.forEach(h => {
+            const color = tierColor(h.tier);
+            L.polyline([[munich.lat, munich.lng], [h.lat, h.lng]], {
+                color, weight: 1.5, opacity: 0.3, dashArray: '6 4'
+            }).addTo(map);
+
+            const label = h.rank || '?';
+            const icon = L.divIcon({
+                html: `<div style="background:${color};color:white;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;border:2.5px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);">${label}</div>`,
+                className: '', iconSize: [28, 28], iconAnchor: [14, 14]
+            });
+
+            const db = h.dealbreaker ? `<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:4px;padding:4px 8px;margin-top:6px;font-size:12px;color:#991b1b;">⛔ ${h.dealbreaker}</div>` : '';
+
+            L.marker([h.lat, h.lng], { icon }).addTo(map).bindPopup(`
+                <div style="max-width:300px;line-height:1.5">
+                    <h3 style="margin:0 0 4px;font-size:15px">${h.rank ? `<span style="background:${color};color:white;border-radius:12px;padding:1px 8px;font-size:12px;margin-right:6px">#${h.rank}</span>` : ''}${h.name}</h3>
+                    <div style="color:#888;font-size:13px;margin-bottom:8px">${h.location} · ${h.elevation} · ${h.beds} beds</div>
+                    <div style="font-size:13px;margin-bottom:4px"><strong>Drive:</strong> ${h.drive} · <strong>Train:</strong> ${h.trainTime}</div>
+                    <div style="font-size:13px;margin-bottom:4px"><strong>Skiing:</strong> ${h.skiArea} — ${h.pisteKm}km</div>
+                    <div style="font-size:13px;margin-bottom:4px"><strong>Price:</strong> ${h.price}</div>
+                    <div style="color:#16a34a;font-size:13px">✅ ${h.strengths}</div>
+                    <div style="color:#dc2626;font-size:13px">⚠️ ${h.warnings}</div>
+                    ${db}
+                    <div style="margin-top:6px;font-size:12px"><a href="${h.link}" target="_blank" style="color:#2563eb">View listing →</a></div>
+                </div>
+            `, { maxWidth: 340 });
         });
 
-        const dealbreaker = h.dealbreaker
-            ? `<div class="dealbreaker">\u26a0\ufe0f DEALBREAKER: ${h.dealbreaker}</div>`
-            : '';
+        // Legend
+        const legend = L.control({ position: 'bottomright' });
+        legend.onAdd = () => {
+            const div = L.DomUtil.create('div', 'legend');
+            div.innerHTML = `
+                <h4>Houses</h4>
+                <div class="legend-item"><span class="dot" style="background:#16a34a"></span> Top picks</div>
+                <div class="legend-item"><span class="dot" style="background:#f59e0b"></span> Solid options</div>
+                <div class="legend-item"><span class="dot" style="background:#2563eb"></span> New (unscored)</div>
+                <div class="legend-item"><span class="dot" style="background:#dc2626"></span> Issues</div>
+                <div class="legend-item"><span class="dot" style="background:#1e40af"></span> Munich</div>
+            `;
+            return div;
+        };
+        legend.addTo(map);
 
-        const popup = `
-            <div class="house-popup">
-                <h3><span class="rank-badge">#${h.rank}</span>${h.name}</h3>
-                <div class="location">${h.location}, ${h.country} \u00b7 ${h.elevation}</div>
-                <div class="details"><strong>Beds:</strong> ${h.beds} &nbsp; <strong>Score:</strong> ${h.score}/45</div>
-                <div class="details"><strong>Drive:</strong> ${h.drive} &nbsp; <strong>Train:</strong> ${h.train}</div>
-                <div class="details"><strong>Skiing:</strong> ${h.ski}</div>
-                <div class="details"><strong>Price:</strong> ${h.price}</div>
-                <div class="strengths">\u2705 ${h.strengths}</div>
-                <div class="warnings">\u26a0\ufe0f ${h.warnings}</div>
-                ${dealbreaker}
-                <div class="link"><a href="${h.link}" target="_blank">View on gruppenhaus.de \u2192</a></div>
+        const allPoints = [[munich.lat, munich.lng], ...houses.map(h => [h.lat, h.lng])];
+        map.fitBounds(allPoints, { padding: [40, 40] });
+    }
+
+    // ============ TABLE ============
+    const columns = [
+        { key: 'name', label: 'Name', format: (h) => `<span class="name-col">${h.name}</span>` },
+        { key: 'location', label: 'Location' },
+        { key: 'beds', label: 'Beds', numeric: true },
+        { key: 'drive', label: 'Drive' },
+        { key: 'trainTime', label: 'Train' },
+        { key: 'skiArea', label: 'Ski Area' },
+        { key: 'pisteKm', label: 'Piste (km)', numeric: true },
+        { key: 'dayPass', label: 'Day Pass' },
+        { key: 'price', label: 'Price' },
+        { key: 'sauna', label: 'Sauna', format: (h) => h.sauna ? '✓' : '—' },
+        { key: 'ensuite', label: 'Ensuite', format: (h) => h.ensuite ? '✓' : '—' },
+        { key: 'gameRoom', label: 'Games', format: (h) => h.gameRoom ? '✓' : '—' },
+        { key: 'score', label: 'Score', numeric: true, format: (h) => h.score ? `${h.score}/45` : '—' },
+    ];
+
+    let tableSortKey = 'rank';
+    let tableSortAsc = true;
+
+    function renderTable() {
+        const thead = document.querySelector('#comparison-table thead');
+        const tbody = document.querySelector('#comparison-table tbody');
+
+        thead.innerHTML = '<tr>' + columns.map(c =>
+            `<th data-key="${c.key}">${c.label} <span class="sort-arrow">${tableSortKey === c.key ? (tableSortAsc ? '▲' : '▼') : '↕'}</span></th>`
+        ).join('') + '</tr>';
+
+        let sorted = [...houses].sort((a, b) => {
+            const key = tableSortKey;
+            const col = columns.find(c => c.key === key);
+            let av = a[key], bv = b[key];
+            if (col && col.numeric) {
+                av = Number(av) || 0; bv = Number(bv) || 0;
+            } else {
+                av = String(av || ''); bv = String(bv || '');
+            }
+            const cmp = av < bv ? -1 : av > bv ? 1 : 0;
+            return tableSortAsc ? cmp : -cmp;
+        });
+
+        tbody.innerHTML = sorted.map(h => {
+            const color = tierColor(h.tier);
+            return '<tr style="border-left: 3px solid ' + color + '">' + columns.map(c => {
+                const val = c.format ? c.format(h) : (h[c.key] ?? '—');
+                return `<td>${val}</td>`;
+            }).join('') + '</tr>';
+        }).join('');
+
+        // Re-bind sort clicks
+        thead.querySelectorAll('th').forEach(th => {
+            th.addEventListener('click', () => {
+                const key = th.dataset.key;
+                if (tableSortKey === key) tableSortAsc = !tableSortAsc;
+                else { tableSortKey = key; tableSortAsc = true; }
+                renderTable();
+            });
+        });
+    }
+    renderTable();
+
+    // ============ SUMMARY ============
+    function renderSummary() {
+        const viable30 = houses.filter(h => h.beds >= 30 && !h.dealbreaker);
+        const scored = houses.filter(h => h.score).sort((a, b) => b.score - a.score);
+        const bigSki = [...houses].sort((a, b) => (b.pisteKm || 0) - (a.pisteKm || 0));
+        const closeDrive = [...houses].filter(h => !h.dealbreaker).sort((a, b) => (a.driveKm || 999) - (b.driveKm || 999));
+
+        const picks = [
+            { title: '🏆 Best Overall', pick: scored[0]?.name || 'TBD', reason: `Score ${scored[0]?.score}/45. ${scored[0]?.strengths?.split(',')[0]}` },
+            { title: '⛷️ Best Skiing', pick: bigSki[0]?.name || 'TBD', reason: `${bigSki[0]?.pisteKm}km of piste — ${bigSki[0]?.skiArea}` },
+            { title: '🚗 Easiest Drive', pick: closeDrive[0]?.name || 'TBD', reason: `${closeDrive[0]?.drive} / ${closeDrive[0]?.driveKm}km from Munich` },
+            { title: '💰 Best Value', pick: 'Franzls Hütte', reason: '€18-25/pp/night, 75km skiing, but only 28 beds' },
+            { title: '👥 Best for 30 ppl', pick: viable30.sort((a,b) => (b.score||0) - (a.score||0))[0]?.name || 'TBD', reason: `${viable30[0]?.beds} beds, viable for the full group` },
+            { title: '🏔️ Best Hiking', pick: 'KSJ-Freizeithaus Pfelders', reason: 'Highest village (1632m), Texelgruppe Natural Park' },
+        ];
+
+        document.getElementById('summary-picks').innerHTML = picks.map(p => `
+            <div class="summary-card">
+                <h4>${p.title}</h4>
+                <div class="pick">${p.pick}</div>
+                <div class="reason">${p.reason}</div>
             </div>
-        `;
+        `).join('');
 
-        L.marker([h.lat, h.lng], { icon })
-            .addTo(map)
-            .bindPopup(popup, { maxWidth: 340 });
-    });
+        const findings = [
+            { icon: '⛔', text: '<strong>Bergheim Maria Trost</strong> — no car access in winter. Ruled out.' },
+            { icon: '⛔', text: '<strong>Höllwart</strong> — ski lifts permanently closed + no party groups. Ruled out.' },
+            { icon: '⚠️', text: '<strong>Maroldenhof (24), Franzls Hütte (28)</strong> — too few beds for 30 people.' },
+            { icon: '💡', text: '<strong>Saalbach ski pass</strong> is €425/6-day — significantly more expensive than other areas.' },
+            { icon: '💡', text: '<strong>Ski Amadé</strong> (Schrempfhof) offers 760km for ~€300/6-day — best km-per-euro.' },
+            { icon: '💡', text: '<strong>SkiWelt</strong> (Brixen) has 280km and is only 1h30 drive from Munich.' },
+            { icon: '📅', text: 'All shops closed Jan 1. Dec 31 closes early (14:00-17:00). Stock up by Dec 30.' },
+            { icon: '🆕', text: '6 new houses added — not yet scored. Brixen, Zillertal, Tuxertal, Krimml, Schrempfhof, Alpenglück.' },
+        ];
 
-    // Legend
-    const legend = L.control({ position: 'bottomright' });
-    legend.onAdd = function() {
-        const div = L.DomUtil.create('div', 'legend');
-        div.innerHTML = `
-            <h4>NYE 2026 Houses</h4>
-            <div class="legend-item"><span class="dot" style="background:#16a34a"></span> Top 3 (recommended)</div>
-            <div class="legend-item"><span class="dot" style="background:#f59e0b"></span> Solid options (#4\u20137)</div>
-            <div class="legend-item"><span class="dot" style="background:#dc2626"></span> Issues / dealbreakers (#8\u201310)</div>
-            <div class="legend-item"><span class="dot" style="background:#1e40af"></span> Munich (start)</div>
-        `;
-        return div;
-    };
-    legend.addTo(map);
-
-    // Fit bounds to show everything
-    const allPoints = [[munich.lat, munich.lng], ...houses.map(h => [h.lat, h.lng])];
-    map.fitBounds(allPoints, { padding: [40, 40] });
+        document.getElementById('summary-findings').innerHTML = '<div style="background:white;border-radius:12px;border:1px solid #e2e8f0;padding:1rem 1.25rem">' +
+            findings.map(f => `<div style="padding:0.5rem 0;border-bottom:1px solid #f1f5f9;font-size:0.9rem">${f.icon} ${f.text}</div>`).join('') +
+            '</div>';
+    }
+    renderSummary();
     </script>
 </body>
 </html>
