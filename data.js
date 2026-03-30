@@ -17,7 +17,7 @@ const houses = [
         warnings: "Prices on request \u2014 need to contact. Ski pass expensive (\u20ac425/6-day)",
         dealbreaker: null,
         link: "https://www.gruppenhaus.de/lindlinghof-stephanie-%26-christoph-hasenauer-hinterglemm-Oesterreich-hs12056.html",
-        image: "",
+        image: "https://www-lindlinghof-at.b-cdn.net/wp-content/uploads/2020/03/JFK-Lindlinghof-Winter-Aussen-0010-scaled.jpg",
         tier: "top"
     },
     {
@@ -38,7 +38,7 @@ const houses = [
         warnings: "Only 24 beds \u2014 too small for 30. Ski pass \u20ac425/6-day",
         dealbreaker: "Only 24 beds",
         link: "https://www.gruppenhaus.de/ferienhaus-maroldenhof-andrea-und-michael-hasenauer-saalbach-hinterglemm-hs10683.html",
-        image: "",
+        image: "https://www.gruppenhaus.de/mx_10683_a_5754_Saalbach-Hinterglemm_Ferienhaus+Maroldenhof_Maroldenweg+4.webp?q=00000000000000",
         tier: "top"
     },
     {
@@ -59,7 +59,7 @@ const houses = [
         warnings: "Prices on request",
         dealbreaker: null,
         link: "https://www.gruppenhaus.de/gruppen-selbstversorgerhaus-klammrast-wildschoenau-oberau-hs11216.html",
-        image: "",
+        image: "https://www.gruppenhaus.de/mx_11216_a_6311_Wildsch%C3%B6nau+-+Oberau_Gruppen-Selbstversorgerhaus+KLAMMRAST_Klammstrasse+167.webp?q=20250712215132",
         tier: "top"
     },
     {
@@ -80,7 +80,7 @@ const houses = [
         warnings: "Expensive: ~\u20ac2,960/night, possible \u20ac2k weekend surcharge",
         dealbreaker: null,
         link: "https://www.gruppenhaus.de/n15-selbstversorgerhuette-im-kleinwalsertal-bis-zu-48-personen-hirschegg%2C-kleinwalsertal%2C-v-hs12873.html",
-        image: "",
+        image: "https://www.gruppenhaus.de/mx_12873_a_87561_Oberstdorf_N15+-+Selbstversorgerh%C3%BCtte+im+Kleinwalsertal_Nebenwasser+15.webp",
         tier: "solid"
     },
     {
@@ -101,7 +101,7 @@ const houses = [
         warnings: "Small local ski area (29km)",
         dealbreaker: null,
         link: "https://www.gruppenhaus.de/haus-canisius-im-st.-michael-alpin-retreat-matrei-am-brenner-hs12729.html",
-        image: "",
+        image: "https://stm.tirol/images/startseite/st-michael-aussen-ansicht-sommer.jpg",
         tier: "solid"
     },
     {
@@ -122,7 +122,7 @@ const houses = [
         warnings: "Small ski area (8km only)",
         dealbreaker: null,
         link: "https://www.gruppenhaus.de/johannishof-im-allgaeu-herzlich-willkommen-nesselwang-hs10449.html",
-        image: "",
+        image: "https://www.gruppenhaus.de/mx_10449_a_87484_Nesselwang_Johannishof+im+Allg%C3%A4u_Schneidbach+16.webp?q=20250918133217",
         tier: "solid"
     },
     {
@@ -143,7 +143,7 @@ const houses = [
         warnings: "B180 Reschenpass under construction until end 2026. Only 28 beds. Poor train link",
         dealbreaker: "Only 28 beds",
         link: "https://www.gruppenhaus.de/franzls-huette-tiroler-oberland-nauders-hs11235.html",
-        image: "",
+        image: "https://www.gruppenhaus.de/mx_11235_a_6543_Nauders++%C3%96sterreich_Franzls+H%C3%BCtte_Nauders+5.webp?q=20260102113500",
         tier: "solid"
     },
     {
@@ -164,7 +164,7 @@ const houses = [
         warnings: "SKI LIFTS PERMANENTLY CLOSED. NO PARTY GROUPS rule",
         dealbreaker: "Ski lifts closed + no parties",
         link: "https://www.gruppenhaus.de/hoellwart-selbstversorgerhaus-50410-000024-2020-goldeggweng-hs10689.html",
-        image: "",
+        image: "https://www.gruppenhaus.de/mx_10689_a_5622_Goldegg_Hoellwart+_Boden+10.webp?q=00000000000000",
         tier: "issue"
     },
     {
@@ -185,7 +185,7 @@ const houses = [
         warnings: "Very remote, 18km piste, supermarket 20-45min, only 2 buses/day",
         dealbreaker: null,
         link: "https://www.gruppenhaus.de/ksj-freizeithaus-widum-pfelders-moos-in-passeier-hs6096.html",
-        image: "",
+        image: "https://www.gruppenhaus.de/mx_6096_a_92224_Amberg_KSJ-Freizeithaus+_Pfelders+Kirchplatz+1.webp?q=20230323094504",
         tier: "issue"
     },
     {
@@ -206,7 +206,7 @@ const houses = [
         warnings: "NO CAR ACCESS Nov\u2013May. 45min uphill walk only in winter",
         dealbreaker: "No vehicle access in winter",
         link: "https://www.gruppenhaus.de/bergheim-maria-trost-nesselwang-hs3754.html",
-        image: "",
+        image: "https://www.gruppenhaus.de/mx_3754_a_86150_Augsburg_Bergheim_Maria+Trost+Allee+100.webp?q=20240328084626",
         tier: "issue"
     },
     // === NEW HOUSES (6) ===
@@ -228,7 +228,7 @@ const houses = [
         warnings: "Sun-Sun booking only in winter. Needs verification",
         dealbreaker: null,
         link: "https://www.gruppenhaus.de/gruppenhaus-brixen-brixen-im-thale-hs12080.html",
-        image: "",
+        image: "https://www.gruppenhaus.de/mx_12080_a_1617+KE_Westwoud_Gruppenhaus+Brixen_Brixenbach+24.webp?q=20240118114639",
         tier: "new"
     },
     {
@@ -249,7 +249,7 @@ const houses = [
         warnings: "Prices on request. Needs verification",
         dealbreaker: null,
         link: "https://simsalabim-reisen.de/unterkunft/selbstversorger-unterkunft-zillertal/",
-        image: "",
+        image: "https://simsalabim-reisen.de/wp-content/uploads/2021/02/Simsalabim_Reisen-Unterkuft-Zillertal.jpg",
         tier: "new"
     },
     {
@@ -270,7 +270,7 @@ const houses = [
         warnings: "Prices on request. Needs verification",
         dealbreaker: null,
         link: "https://www.gruppenhaus.de/gruppenhaus-tuxertal-zillertaler-alpen-vorderlanersbach-hs10386.html",
-        image: "",
+        image: "https://www.huettenland.com/fotos/huetten_klein/7/202303100856470.Gruppenhaus-Tuxertal.jpg",
         tier: "new"
     },
     {
@@ -291,7 +291,7 @@ const houses = [
         warnings: "Prices on request. Needs verification",
         dealbreaker: null,
         link: "https://buchen.gruppenchalets.com/Oesterreich/Salzburg/Hohe.Tauern/Gruppenhaus.Krimml.Kitzbueheler.Alpen",
-        image: "",
+        image: "https://www.gruppenchalets.com/wp-content/uploads/classified-listing/2024/07/gruppenhaus-krimml-aussen-01.jpg",
         tier: "new"
     },
     {
@@ -312,7 +312,7 @@ const houses = [
         warnings: "Min 6 nights in winter. NYE surcharge \u20ac70/room. \u20ac47/pp is mid-range",
         dealbreaker: null,
         link: "https://www.gruppenhaus.de/schrempfhof-flachau-hs12085.html",
-        image: "",
+        image: "https://www.gruppenhaus.de/mx_12085_a_5542_Flachau_Schrempfhof_Schrempf-Rosnergasse+175.webp?q=20231225190323",
         tier: "new"
     },
     {
@@ -333,7 +333,7 @@ const houses = [
         warnings: "Limited info \u2014 own website only. Needs verification",
         dealbreaker: null,
         link: "https://www.gruppenhaus-tirol.at/",
-        image: "",
+        image: "https://www.gruppenhaus-tirol.at/userdata/7503/pid/80446/pageElem/23649/29943/20231125_122354_Kopie.jpg",
         tier: "new"
     }
 ];
