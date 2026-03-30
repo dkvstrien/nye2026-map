@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NYE 2026 Group Houses</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+        #map { height: 100vh; width: 100%; }
+
+        .house-popup { max-width: 320px; line-height: 1.5; }
+        .house-popup h3 { margin-bottom: 4px; font-size: 15px; }
+        .house-popup .rank-badge {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            border-radius: 12px;
+            padding: 1px 8px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 6px;
+        }
+        .house-popup .score { color: #666; font-size: 13px; }
+        .house-popup .location { color: #888; font-size: 13px; margin-bottom: 8px; }
+        .house-popup .details { font-size: 13px; margin-bottom: 6px; }
+        .house-popup .details strong { color: #333; }
+        .house-popup .strengths { color: #16a34a; font-size: 13px; margin-bottom: 4px; }
+        .house-popup .warnings { color: #dc2626; font-size: 13px; font-weight: 500; }
+        .house-popup .link { font-size: 12px; margin-top: 6px; }
+        .house-popup .link a { color: #2563eb; }
+        .house-popup .dealbreaker {
+            background: #fef2f2;
+            border: 1px solid #fca5a5;
+            border-radius: 4px;
+            padding: 4px 8px;
+            margin-top: 6px;
+            font-size: 12px;
+            color: #991b1b;
+        }
+
+        .legend {
+            background: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            font-size: 13px;
+            line-height: 1.8;
+        }
+        .legend h4 { margin-bottom: 4px; font-size: 14px; }
+        .legend .legend-item { display: flex; align-items: center; gap: 8px; }
+        .legend .dot {
+            width: 14px; height: 14px;
+            border-radius: 50%;
+            display: inline-block;
+            border: 2px solid white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .info-panel {
+            position: absolute;
+            top: 10px;
+            left: 55px;
+            z-index: 1000;
+            background: white;
+            padding: 10px 14px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            font-size: 13px;
+            max-width: 280px;
+        }
+        .info-panel h3 { font-size: 15px; margin-bottom: 4px; }
+        .info-panel p { color: #666; margin: 0; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div class="info-panel">
+        <h3>NYE 2026 Group Houses</h3>
+        <p>10 options from Munich by car/train. Click pins for details.</p>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+    const houses = [
+        {
+            name: "Lindlinghof",
+            location: "Hinterglemm, Salzburg",
+            country: "Austria",
+            lat: 47.37739, lng: 12.5758,
+            rank: 1, score: 38, beds: 36,
+            elevation: "1020m",
+            drive: "2h 20min", train: "~4h (1-2 changes)",
+            ski: "Saalbach Skicircus — 270km, 70 lifts",
+            price: "On request",
+            strengths: "140m\u00b2 wellness (Finnish/herbal/infrared sauna), 270km skiing, best NYE atmosphere, all ensuite",
+            warnings: "Prices on request, ski pass \u20ac425/6-day",
+            link: "https://www.gruppenhaus.de/lindlinghof-stephanie-%26-christoph-hasenauer-hinterglemm-Oesterreich-hs12056.html",
+            color: "#16a34a"
+        },
+        {
+            name: "Ferienhaus Maroldenhof",
+            location: "Saalbach-Hinterglemm, Salzburg",
+            country: "Austria",
+            lat: 47.37501, lng: 12.543747,
+            rank: 2, score: 37, beds: 24,
+            elevation: "1003m",
+            drive: "2h 20min", train: "~3h30 (1-2 changes)",
+            ski: "Saalbach Skicircus — 270km, 70 lifts",
+            price: "\u20ac1,230-1,640/night flat",
+            strengths: "Two chalets (historic 1707 + modern 2019), 9 ensuite rooms, great NYE, Joker Card",
+            warnings: "Ski pass expensive (\u20ac425/6-day)",
+            link: "https://www.gruppenhaus.de/ferienhaus-maroldenhof-andrea-und-michael-hasenauer-saalbach-hinterglemm-hs10683.html",
+            color: "#16a34a"
+        },
+        {
+            name: "Klammrast",
+            location: "Wildsch\u00f6nau-Oberau, Tirol",
+            country: "Austria",
+            lat: 47.443864, lng: 12.049792,
+            rank: 3, score: 35, beds: 44,
+            elevation: "936m",
+            drive: "1h 20min", train: "~3h (1-2 changes)",
+            ski: "Ski Juwel — 109km, 45 lifts",
+            price: "On request",
+            strengths: "Closest drive from Munich (1h20), 44 beds, all ensuite, pets welcome, free ski bus",
+            warnings: "Prices on request",
+            link: "https://www.gruppenhaus.de/gruppen-selbstversorgerhaus-klammrast-wildschoenau-oberau-hs11216.html",
+            color: "#16a34a"
+        },
+        {
+            name: "N15 Selbstversorgerh\u00fctte",
+            location: "Hirschegg, Kleinwalsertal",
+            country: "Austria",
+            lat: 47.337596, lng: 10.173724,
+            rank: 4, score: 34, beds: 48,
+            elevation: "1124m",
+            drive: "2h", train: "~2h40 (1 change via Oberstdorf)",
+            ski: "Oberstdorf-Kleinwalsertal — 130km, 48 lifts",
+            price: "~\u20ac2,960/night flat rate",
+            strengths: "Biggest capacity (48 beds), 130km skiing, excellent winter hiking, easy train access, panoramic terrace",
+            warnings: "Expensive: ~\u20ac2,960/night, possible \u20ac2k weekend surcharge",
+            link: "https://www.gruppenhaus.de/n15-selbstversorgerhuette-im-kleinwalsertal-bis-zu-48-personen-hirschegg%2C-kleinwalsertal%2C-v-hs12873.html",
+            color: "#f59e0b"
+        },
+        {
+            name: "Haus Canisius",
+            location: "Matrei am Brenner, Tirol",
+            country: "Austria",
+            lat: 47.13363, lng: 11.45975,
+            rank: 5, score: 31, beds: 31,
+            elevation: "990m",
+            drive: "1h 30min", train: "~2h (1 change, Brenner line)",
+            ski: "Bergeralm — 29km, 7 lifts (Stubaier Gletscher 30min)",
+            price: "\u20ac850-1,250/night flat",
+            strengths: "Best train connection (Brenner mainline), B&B/half-board/full-board options, 2 seminar rooms",
+            warnings: "Small local ski area (29km)",
+            link: "https://www.gruppenhaus.de/haus-canisius-im-st.-michael-alpin-retreat-matrei-am-brenner-hs12729.html",
+            color: "#f59e0b"
+        },
+        {
+            name: "Johannishof im Allg\u00e4u",
+            location: "Nesselwang, Bavaria",
+            country: "Germany",
+            lat: 47.635292, lng: 10.632148,
+            rank: 6, score: 30, beds: 33,
+            elevation: "867m",
+            drive: "1h 25min", train: "~2h30 (1 change)",
+            ski: "Alpspitze Nesselwang — 8km, 5 lifts",
+            price: "\u20ac18-46/person/night",
+            strengths: "Working farm, 1h25 drive, good train link, K\u00f6nigscard included, own sledding hill",
+            warnings: "Small ski area (8km only)",
+            link: "https://www.gruppenhaus.de/johannishof-im-allgaeu-herzlich-willkommen-nesselwang-hs10449.html",
+            color: "#f59e0b"
+        },
+        {
+            name: "Franzls H\u00fctte",
+            location: "Nauders, Tirol",
+            country: "Austria",
+            lat: 46.887753, lng: 10.501707,
+            rank: 7, score: 29, beds: 28,
+            elevation: "1394m",
+            drive: "2h 30min", train: "~4h15 (2-3 changes)",
+            ski: "Nauders Bergkastel — 75km, 11 lifts",
+            price: "\u20ac18-25/person/night",
+            strengths: "Budget winner (\u20ac18-25/pp), 75km skiing, 3-country ski pass, high altitude = snow-sure",
+            warnings: "B180 Reschenpass under construction until end 2026, poor train link",
+            link: "https://www.gruppenhaus.de/franzls-huette-tiroler-oberland-nauders-hs11235.html",
+            color: "#f59e0b"
+        },
+        {
+            name: "H\u00f6llwart Selbstversorgerhaus",
+            location: "Goldeggweng, Salzburg",
+            country: "Austria",
+            lat: 47.316177, lng: 13.034937,
+            rank: 8, score: 24, beds: 33,
+            elevation: "854m",
+            drive: "2h", train: "~3h45 (2 changes)",
+            ski: "Local lifts CLOSED \u2014 nearest: St. Johann/Ski Amad\u00e9 12km",
+            price: "\u20ac410-500/night flat (up to 20 ppl)",
+            strengths: "Outdoor sauna, games room, cheap flat rate, football pitch",
+            warnings: "SKI LIFTS PERMANENTLY CLOSED since 2024/25. NO PARTY GROUPS rule.",
+            dealbreaker: "Main ski lifts closed + no parties",
+            link: "https://www.gruppenhaus.de/hoellwart-selbstversorgerhaus-50410-000024-2020-goldeggweng-hs10689.html",
+            color: "#dc2626"
+        },
+        {
+            name: "KSJ-Freizeithaus Pfelders",
+            location: "Pfelders, Moos in Passeier",
+            country: "Italy",
+            lat: 46.7956, lng: 11.0898,
+            rank: 9, score: 21, beds: 38,
+            elevation: "1632m",
+            drive: "3h", train: "6h+ (3+ changes)",
+            ski: "Pfelders — 18km, 4 lifts",
+            price: "\u20ac13-25/person/night",
+            strengths: "Highest village (1632m), cheapest option, stunning Texelgruppe nature, car-free tranquility",
+            warnings: "Very remote, car-free village, 18km piste only, nearest supermarket 20-45min, only 2 buses/day",
+            link: "https://www.gruppenhaus.de/ksj-freizeithaus-widum-pfelders-moos-in-passeier-hs6096.html",
+            color: "#dc2626"
+        },
+        {
+            name: "Bergheim Maria Trost",
+            location: "Nesselwang, Bavaria",
+            country: "Germany",
+            lat: 47.60813, lng: 10.51114,
+            rank: 10, score: 18, beds: 24,
+            elevation: "1123m",
+            drive: "1h 25min", train: "~2h30 (1 change)",
+            ski: "Alpspitze Nesselwang — 8km, 5 lifts",
+            price: "\u20ac125-264/night flat",
+            strengths: "Cheapest flat rate",
+            warnings: "NO CAR ACCESS November\u2013May. Only reachable by 45min uphill walk in winter.",
+            dealbreaker: "No vehicle access in winter",
+            link: "https://www.gruppenhaus.de/bergheim-maria-trost-nesselwang-hs3754.html",
+            color: "#dc2626"
+        }
+    ];
+
+    // Munich marker
+    const munich = { lat: 48.1351, lng: 11.5820 };
+
+    // Init map centered to show all locations + Munich
+    const map = L.map('map').setView([47.5, 11.5], 8);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors',
+        maxZoom: 18
+    }).addTo(map);
+
+    // Munich marker
+    const munichIcon = L.divIcon({
+        html: '<div style="background:#1e40af;color:white;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;border:3px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);">M</div>',
+        className: '',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16]
+    });
+    L.marker([munich.lat, munich.lng], { icon: munichIcon })
+        .addTo(map)
+        .bindPopup('<strong>Munich</strong><br>Starting point');
+
+    // Draw lines from Munich to each house
+    houses.forEach(h => {
+        L.polyline([[munich.lat, munich.lng], [h.lat, h.lng]], {
+            color: h.color,
+            weight: 1.5,
+            opacity: 0.3,
+            dashArray: '6 4'
+        }).addTo(map);
+    });
+
+    // House markers
+    houses.forEach(h => {
+        const icon = L.divIcon({
+            html: `<div style="background:${h.color};color:white;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;border:2.5px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);">${h.rank}</div>`,
+            className: '',
+            iconSize: [28, 28],
+            iconAnchor: [14, 14]
+        });
+
+        const dealbreaker = h.dealbreaker
+            ? `<div class="dealbreaker">\u26a0\ufe0f DEALBREAKER: ${h.dealbreaker}</div>`
+            : '';
+
+        const popup = `
+            <div class="house-popup">
+                <h3><span class="rank-badge">#${h.rank}</span>${h.name}</h3>
+                <div class="location">${h.location}, ${h.country} \u00b7 ${h.elevation}</div>
+                <div class="details"><strong>Beds:</strong> ${h.beds} &nbsp; <strong>Score:</strong> ${h.score}/45</div>
+                <div class="details"><strong>Drive:</strong> ${h.drive} &nbsp; <strong>Train:</strong> ${h.train}</div>
+                <div class="details"><strong>Skiing:</strong> ${h.ski}</div>
+                <div class="details"><strong>Price:</strong> ${h.price}</div>
+                <div class="strengths">\u2705 ${h.strengths}</div>
+                <div class="warnings">\u26a0\ufe0f ${h.warnings}</div>
+                ${dealbreaker}
+                <div class="link"><a href="${h.link}" target="_blank">View on gruppenhaus.de \u2192</a></div>
+            </div>
+        `;
+
+        L.marker([h.lat, h.lng], { icon })
+            .addTo(map)
+            .bindPopup(popup, { maxWidth: 340 });
+    });
+
+    // Legend
+    const legend = L.control({ position: 'bottomright' });
+    legend.onAdd = function() {
+        const div = L.DomUtil.create('div', 'legend');
+        div.innerHTML = `
+            <h4>NYE 2026 Houses</h4>
+            <div class="legend-item"><span class="dot" style="background:#16a34a"></span> Top 3 (recommended)</div>
+            <div class="legend-item"><span class="dot" style="background:#f59e0b"></span> Solid options (#4\u20137)</div>
+            <div class="legend-item"><span class="dot" style="background:#dc2626"></span> Issues / dealbreakers (#8\u201310)</div>
+            <div class="legend-item"><span class="dot" style="background:#1e40af"></span> Munich (start)</div>
+        `;
+        return div;
+    };
+    legend.addTo(map);
+
+    // Fit bounds to show everything
+    const allPoints = [[munich.lat, munich.lng], ...houses.map(h => [h.lat, h.lng])];
+    map.fitBounds(allPoints, { padding: [40, 40] });
+    </script>
+</body>
+</html>
